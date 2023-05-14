@@ -1,47 +1,73 @@
 #include <stdio.h>
-#include "wavio.h"
-#include "audio.h"
+#include <stdlib.h>
 
-char read_wav(char* file_name, Audio* audio){
+#include <wavio.h>
+#include <audio.h>
+
+char compare(int length, char* a, char* b){
+    for(int i = 0; i < length; ++i)
+        if(a[i] != b[i])
+            return -1;
+    return 1;
+}
+
+Audio read_wav(char* file_name, char* has_err, char** err_msg){
+    *has_err = 0;
+
     FILE *fp = fopen(file_name, "rb");
     if(fp == NULL){
-        return -1;
+        *has_err = 1;
+        *err_msg = "no file";
+        return;
     }
 
     char tag[4];
     fread(&tag, sizeof(char), 4, fp);
-    if(tag != "RIFF"){
+    if(!compare(4, tag, "RIFF")){
         fclose(fp);
-        return -1;
+        //printf("tag=%s\n", tag);
+        *has_err = 1;
+        *err_msg = "tag is not RIFF";
+        return;
     }
 
     unsigned int size;
     fread(&size, sizeof(int), 1, fp);
+    unsigned int file_size = size;
+    /*
     if(size != 4){
         fclose(fp);
-        return -1;
+        printf("size=%u=%x\n", size, size);
+        return -3;
     }
+    */
 
     char format[4];
     fread(&format, sizeof(char), 4, fp);
-    if(format != "WAVE"){
+    if(!compare(4, format, "WAVE")){
         fclose(fp);
-        return -1;
+        *has_err = 1;
+        *err_msg = "format is not WAVE";
+        return;
     }
 
     char temp;
+    /*
     for(unsigned int i = 4; i < size; ++i){
         fread(&temp, sizeof(char), 1, fp);
     }
+    */
 
-    while(1){
+   char read_fmt = 0;
+   char read_data = 0;
+   Audio audio;
+
+    for(unsigned int k = 0; k < file_size; k += 8){
         size_t r = fread(&tag, sizeof(char), 4, fp);
-        if(r <= 0){
-            fclose(fp);
-            return -1;
-        }
         fread(&size, sizeof(int), 1, fp);
-        if(tag == "fmt "){
+
+        if(!read_fmt && compare(4, tag, "fmt ")){
+            printf("format chunk\n");
             unsigned short audio_format;
             unsigned short channels;
             unsigned int sample_per_second;
@@ -57,33 +83,56 @@ char read_wav(char* file_name, Audio* audio){
             for(unsigned int i = 16; i < size; ++i)
                 fread(&temp, sizeof(char), 1, fp);
 
-            audio->bit_per_sample = bits_per_sample;
-            audio->channel_size = channels;
-            audio->sample_per_second = sample_per_second;
+            audio.bit_per_sample = bits_per_sample;
+            audio.channel_size = channels;
+            audio.sample_per_second = sample_per_second;
+            printf("チャンネル数　　　:%u\n", audio.channel_size);
+            printf("量子化ビット数　　:%u\n", audio.bit_per_sample);
+            printf("サンプリング周波数:%u\n", audio.sample_per_second);
+
+            read_fmt = 1;
         }
-        else if(tag == "data"){
-            unsigned short c = audio->channel_size;
+        else if(!read_data && compare(4, tag, "data")){
+            printf("data chunk\n");
+            unsigned short c = audio.channel_size;
             unsigned int n = size / c;
-            audio->data_size = n;
-            audio->data = (int**)malloc(sizeof(int*) * c);
+            audio.data_size = n;
+            audio.data = (int**)malloc(sizeof(int*) * c);
+            printf("c=%u, n=%u\n", c, n);
             for(unsigned short i = 0; i < c; +i)
-                audio->data[i] = (int*)malloc(sizeof(int) * n);
+                audio.data[i] = (int*)malloc(sizeof(int) * n);
+
+            printf("d");
 
             for(unsigned int j = 0; j < n; ++j){
                 for(unsigned short i = 0; i < c; ++i){
-                    fread(&audio->data[i][j], sizeof(short), 1, fp);
+                    fread(&audio.data[i][j], sizeof(short), 1, fp);
                 }
             }
 
-            break;
+            printf("a\n");
+
+            read_data = 1;
         }
         else{
             for(unsigned int i = 0; i < size; ++i)
                 fread(&temp, sizeof(char), 1, fp);
         }
+
+        k += size;
     }
 
     fclose(fp);
 
-    return 0;
+    if(read_fmt && read_data)
+        return audio;
+    else if(!read_fmt){
+        *has_err = 1;
+        *err_msg = "no fmt chunk";
+        return;
+    }
+    else{
+        *has_err = 1;
+        *err_msg = "no data chunk";
+    }
 }

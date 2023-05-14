@@ -1,3 +1,8 @@
+#ifndef _WAVIO_H_
+#define _WAvIO_H_
+
 #include "audio.h"
 
-char read_wav(char* file_name, Audio* audio);
+Audio read_wav(char* file_name, char* has_err, char** err_msg);
+
+#endif

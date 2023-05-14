@@ -1,3 +1,6 @@
+#ifndef _AUDIO_H_
+#define _AUDIO_H_
+
 typedef struct{
     unsigned short channel_size;
     unsigned int sample_per_second;
@@ -5,3 +8,5 @@ typedef struct{
     unsigned int data_size;
     int** data;
 }Audio;
+
+#endif
