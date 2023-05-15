@@ -67,7 +67,6 @@ Audio read_wav(char* file_name, char* has_err, char** err_msg){
         fread(&size, sizeof(int), 1, fp);
 
         if(!read_fmt && compare(4, tag, "fmt ")){
-            printf("format chunk\n");
             unsigned short audio_format;
             unsigned short channels;
             unsigned int sample_per_second;
@@ -86,33 +85,27 @@ Audio read_wav(char* file_name, char* has_err, char** err_msg){
             audio.bit_per_sample = bits_per_sample;
             audio.channel_size = channels;
             audio.sample_per_second = sample_per_second;
-            printf("チャンネル数　　　:%u\n", audio.channel_size);
-            printf("量子化ビット数　　:%u\n", audio.bit_per_sample);
-            printf("サンプリング周波数:%u\n", audio.sample_per_second);
 
             read_fmt = 1;
         }
         else if(!read_data && compare(4, tag, "data")){
-            printf("data chunk\n");
             unsigned short c = audio.channel_size;
-            unsigned int n = size / c;
+            unsigned int n = size / (sizeof(short) * c);
             audio.data_size = n;
             audio.data = (int**)malloc(sizeof(int*) * c);
-            printf("c=%u, n=%u\n", c, n);
-            for(unsigned short i = 0; i < c; +i)
+            for(unsigned short i = 0; i < c; ++i)
                 audio.data[i] = (int*)malloc(sizeof(int) * n);
 
-            printf("d");
-
+            short d;
             for(unsigned int j = 0; j < n; ++j){
                 for(unsigned short i = 0; i < c; ++i){
-                    fread(&audio.data[i][j], sizeof(short), 1, fp);
+                    fread(&d, sizeof(short), 1, fp);
+                    audio.data[i][j] = (int)d;
                 }
             }
 
-            printf("a\n");
-
             read_data = 1;
+            break;
         }
         else{
             for(unsigned int i = 0; i < size; ++i)
