@@ -1,8 +1,7 @@
 #ifndef _DP_H_
 #define _DP_H_
 
-// ret[i][0/1] = index of a/b of i th pair
-// a must be longer than b
-void matching(size_t a_size, size_t b_size, int* a, int* b, int move_cost, int diff_cost, size_t* ret_size, size_t*** ret, unsigned long* cost);
+// route[i][0/1] = index of a/b of i th pair
+void matching(int a_size, int b_size, double** a, double** b, int frame_size, int* route_size, int*** route, double* dist);
 
 #endif
