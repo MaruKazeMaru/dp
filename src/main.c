@@ -3,27 +3,30 @@
 #include <dirent.h>
 
 #include <dp.h>
-#include <wavio.h>
-
+#include <city.h>
+#include <txtlist.h>
 
 int main(int argc, char** argv){
-    if(argc < 3){
-        printf("too few arguments\n");
-        return 1;
-    }
-    DIR* dir_template = opendir(argv[1]);
-    DIR* dir_unknown = opendir(argv[2]);
-    if(dir_template == NULL || dir_unknown == NULL){
-        printf("can not open directory\n");
-        return 1;
-    }
-    struct dirent* d_or_f;
-    char** file_template_names = (char*)malloc(sizeof(char) * 110);
+/*
+    CITY* city = get_city(argv[1]);
 
-    d_or_f = readdir(dir_template);
-    while(d_or_f != NULL){
-        int len = d_or_f->d_reclen;
-    }
+    printf("city\n");
+    printf("file_name   =%s\n", city->file_name);
+    printf("content     =%s\n", city->content);
+    printf("data_len    =%d\n", city->data_len);
+    printf("data[ 0][ 0]=%lf\n", city->data[0][0]);
+    printf("data[%d][14]=%lf\n", city->data_len - 1, city->data[city->data_len - 1][14]);
 
+    free_city(city);
+*/
+/*
+    TXTLIST* txtlist = get_txtlist(argv[1], 220);
+
+    printf("txtlist_size=%d\n", txtlist->len);
+    printf("txtlist[ 0]=%s\n", txtlist->elem[0]);
+    printf("txtlist[%d]=%s\n", txtlist->len - 1, txtlist->elem[txtlist->len - 1]);
+
+    free(txtlist);
+*/
     return 0;
 }
