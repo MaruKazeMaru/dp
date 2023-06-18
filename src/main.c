@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 
-#include <dp.h>
-#include <city.h>
-#include <txtlist.h>
+
+#include <dp_matching.h>
+//#include <city.h>
+//#include <txtlist.h>
 
 int main(int argc, char** argv){
 /*
@@ -28,5 +28,28 @@ int main(int argc, char** argv){
 
     free(txtlist);
 */
+
+    float** a = (float**)malloc(sizeof(float) * 2);
+    a[0] = (float*)malloc(sizeof(float) * 2);
+    a[1] = (float*)malloc(sizeof(float) * 2);
+    a[0][0] = 0.0f;
+    a[0][1] = 1.0f;
+    a[1][0] = 1.0f;
+    a[1][1] = -1.0f;
+
+    float** b = (float**)malloc(sizeof(float) * 3);
+    b[0] = (float*)malloc(sizeof(float) * 2);
+    b[1] = (float*)malloc(sizeof(float) * 2);
+    b[2] = (float*)malloc(sizeof(float) * 2);
+    b[0][0] = 0.0f;
+    b[0][1] = 2.0f;
+    b[1][0] = 1.0f;
+    b[1][1] = 1.0f;
+    b[2][0] = -1.0f;
+    b[2][1] = 0.0f;
+
+    double total_dist = dp_matching(2, 3, a, b, 2);
+    printf("%lf\n", total_dist);
+
     return 0;
 }
