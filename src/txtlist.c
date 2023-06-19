@@ -52,6 +52,8 @@ TXTLIST* get_txtlist(char* dir_name, int max_txtlist_size){
         }
     }
 
+    closedir(dir);
+
 
     TXTLIST* ret = (TXTLIST*)malloc(sizeof(TXTLIST));
     ret->len = cnt;

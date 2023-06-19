@@ -14,8 +14,6 @@ target_include_directories(dp_matching
   PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
-#target_link_libraries(${PROJECT_NAME} m)
-
 add_executable(main.out main.c)
 
 target_link_libraries(main.out m)

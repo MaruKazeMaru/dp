@@ -4,28 +4,32 @@
 
 #include <dp_matching.h>
 
-float euclid_dist(int size, float* a, float* b){
-    float sqsum = 0.0f;
-    float temp;
+float euclid_dist(int size, double* a, double* b){
+    double sqsum = 0.0f;
+    double temp;
     for(int i = 0; i < size; ++i){
         temp = a[i] - b[i];
         sqsum += temp * temp;
     }
 
-    return sqrtf(sqsum);
+    return sqrt(sqsum);
 }
 
-double dp_matching(int a_size, int b_size, float** a, float** b, int frame_size){
+double dp_matching(int a_size, int b_size, double** a, double** b, int frame_size){
     double** dp = (double**)malloc(sizeof(double*) * 2);
     dp[0] = (double*)malloc(sizeof(double) * b_size);
     dp[1] = (double*)malloc(sizeof(double) * b_size);
 
-    dp[0][0] = euclid_dist(frame_size, a[0], b[0]);
+    dp[1][0] = euclid_dist(frame_size, a[0], b[0]);
     for(int j = 1; j < b_size; ++j){
-        dp[0][j] = dp[0][j - 1] + euclid_dist(frame_size, a[0], b[j]);
+        dp[1][j] = dp[1][j - 1] + euclid_dist(frame_size, a[0], b[j]);
     }
 
     for(int i = 1; i < a_size; ++i){
+        for(int j = 0; j < b_size; ++j){
+            dp[0][j] = dp[1][j];
+        }
+
         dp[1][0] = dp[0][0] + euclid_dist(frame_size, a[i], b[0]);
 
         for(int j = 1; j < b_size; ++j){
@@ -44,13 +48,9 @@ double dp_matching(int a_size, int b_size, float** a, float** b, int frame_size)
                 dp[1][j] = c;
             }
         }
-
-        for(int j = 0; j < b_size; ++j){
-            dp[0][j] = dp[1][j];
-        }
     }
 
-    double total_dist = dp[a_size - 1][b_size - 1];
+    double total_dist = dp[1][b_size - 1];
     free(dp[0]);
     free(dp[1]);
     free(dp);

@@ -49,6 +49,8 @@ CITY* get_city(char* file_path){
         }
     }
 
+    fclose(f);
+
     return city;
 }
 
