@@ -46,6 +46,7 @@ char* my_strcpy(char* original){
 int main(int argc, char** argv){
     char* dir_template = argv[1];
     char* dir_unknown = argv[2];
+    double sym_weight = strtod(argv[3], NULL);
 
     TXTLIST* txtlist_template = get_txtlist(dir_template, 110);
     TXTLIST* txtlist_unknown  = get_txtlist(dir_unknown, 110);
@@ -68,7 +69,7 @@ int main(int argc, char** argv){
             free(path);
 
 
-            double dist = dp_matching(city_unknown->data_len, city_template->data_len, city_unknown->data, city_template->data, 15);
+            double dist = dp_matching(city_unknown->data_len, city_template->data_len, city_unknown->data, city_template->data, 15, sym_weight);
 
             if(dist < min){
                 min = dist;

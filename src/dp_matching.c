@@ -15,7 +15,7 @@ float euclid_dist(int size, double* a, double* b){
     return sqrt(sqsum);
 }
 
-double dp_matching(int a_size, int b_size, double** a, double** b, int frame_size){
+double dp_matching(int a_size, int b_size, double** a, double** b, int frame_size, double sym_weight){
     double** dp = (double**)malloc(sizeof(double*) * 2);
     dp[0] = (double*)malloc(sizeof(double) * b_size);
     dp[1] = (double*)malloc(sizeof(double) * b_size);
@@ -34,7 +34,7 @@ double dp_matching(int a_size, int b_size, double** a, double** b, int frame_siz
 
         for(int j = 1; j < b_size; ++j){
             float dist = euclid_dist(frame_size, a[i], b[j]);
-            double s = dp[0][j - 1] + 2.0 * dist;
+            double s = dp[0][j - 1] + sym_weight * dist;
             double r = dp[0][j]     + dist;
             double c = dp[1][j - 1] + dist;
 
