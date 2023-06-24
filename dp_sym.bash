@@ -8,6 +8,6 @@ touch ${RESULT_FILE}
 
 for i in $(seq $3 $4 $5)
 do
-	./build/src/main.out ./data/$1 ./data/$2 $i | grep " O " | wc -l >>  ${RESULT_FILE}
+	./build/src/main.out $1 $2 $i | grep " O " | wc -l >>  ${RESULT_FILE}
 	echo "$i finished"
 done
